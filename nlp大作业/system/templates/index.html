@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中英翻译系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>中英翻译系统</h1>
+        <textarea id="input_text" placeholder="请输入中文或英文"></textarea>
+        <div>
+            <label for="model_select">选择模型：</label>
+            <select id="model_select">
+                <option value="lstm">LSTM 模型</option>
+                <option value="gru">GRU 模型</option>
+            </select>
+        </div>
+        <button id="translate_btn">翻译</button>
+        <h2>翻译结果：</h2>
+        <p id="translation_result"></p>
+    </div>
+
+    <script>
+        document.getElementById('translate_btn').onclick = function () {
+            const inputText = document.getElementById('input_text').value;
+            const modelType = document.getElementById('model_select').value;
+
+            fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `input_text=${encodeURIComponent(inputText)}&model_type=${modelType}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.translation) {
+                    document.getElementById('translation_result').innerText = data.translation;
+                } else if (data.error) {
+                    document.getElementById('translation_result').innerText = data.error;
+                }
+            });
+        };
+    </script>
+</body>
+</html>
