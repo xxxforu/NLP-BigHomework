@@ -1,13 +1,10 @@
-# 1.加载模型
 from tensorflow.keras.models import load_model
 
 # 加载模型
-model = load_model('lstm_translation_model.h5')
+model = load_model('/mnt/data/lstm_translation_model.h5', custom_objects={
+    'Encoder': Encoder,
+    'Decoder': Decoder
+})
 
-# 查看模型结构
+# 打印模型架构
 model.summary()
-
-# 2.查看模型架构
-with open('model_structure.txt', 'w') as f:
-    model.summary(print_fn=lambda x: f.write(x + '\n'))
-

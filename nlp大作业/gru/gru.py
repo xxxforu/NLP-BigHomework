@@ -107,6 +107,6 @@ history = model.fit(
 )
 
 
-model.save('gru_translation_model.h5')
+model.save('gru_translation_model.keras')
 
 print("Model training complete.")

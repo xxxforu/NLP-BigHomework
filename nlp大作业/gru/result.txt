@@ -1,0 +1,22 @@
+
+Epoch 1/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 322s 436ms/step - accuracy: 0.7472 - loss: 2.1396 - val_accuracy: 0.8059 - val_loss: 1.2994
+Epoch 2/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 322s 442ms/step - accuracy: 0.8125 - loss: 1.1927 - val_accuracy: 0.8260 - val_loss: 1.1057
+Epoch 3/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 358s 491ms/step - accuracy: 0.8356 - loss: 0.9243 - val_accuracy: 0.8372 - val_loss: 1.0080
+Epoch 4/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 393s 506ms/step - accuracy: 0.8556 - loss: 0.7216 - val_accuracy: 0.8451 - val_loss: 0.9610
+Epoch 5/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 359s 492ms/step - accuracy: 0.8769 - loss: 0.5616 - val_accuracy: 0.8497 - val_loss: 0.9425
+Epoch 6/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 333s 425ms/step - accuracy: 0.9013 - loss: 0.4313 - val_accuracy: 0.8524 - val_loss: 0.9454
+Epoch 7/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 300s 412ms/step - accuracy: 0.9212 - loss: 0.3375 - val_accuracy: 0.8558 - val_loss: 0.9511
+Epoch 8/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 322s 412ms/step - accuracy: 0.9388 - loss: 0.2574 - val_accuracy: 0.8563 - val_loss: 0.9706
+Epoch 9/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 306s 420ms/step - accuracy: 0.9524 - loss: 0.2016 - val_accuracy: 0.8564 - val_loss: 0.9870
+Epoch 10/10
+729/729 ━━━━━━━━━━━━━━━━━━━━ 309s 424ms/step - accuracy: 0.9634 - loss: 0.1576 - val_accuracy: 0.8563 - val_loss: 1.0164
+Model training complete.

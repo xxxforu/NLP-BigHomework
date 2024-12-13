@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中英翻译</title>
+</head>
+<body>
+    <h1>中英翻译系统</h1>
+    <form method="post">
+        <textarea name="input_text" rows="4" cols="50" placeholder="请输入中文或英文"></textarea><br>
+        <label for="model_choice">选择模型:</label>
+        <select name="model_choice" id="model_choice">
+            <option value="GRU">GRU模型</option>
+            <option value="LSTM">LSTM模型</option>
+        </select><br>
+        <button type="submit">翻译</button>
+    </form>
+
+    {% if translation %}
+        <h2>翻译结果:</h2>
+        <p>{{ translation }}</p>
+    {% endif %}
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中英翻译</title>
+</head>
+<body>
+    <h1>中英翻译系统</h1>
+    <form method="post">
+        <textarea name="input_text" rows="4" cols="50" placeholder="请输入中文或英文"></textarea><br>
+        <label for="model_choice">选择模型:</label>
+        <select name="model_choice" id="model_choice">
+            <option value="GRU">GRU模型</option>
+            <option value="LSTM">LSTM模型</option>
+        </select><br>
+        <button type="submit">翻译</button>
+    </form>
+
+    {% if translation %}
+        <h2>翻译结果:</h2>
+        <p>{{ translation }}</p>
+    {% endif %}
+</body>
+</html>
