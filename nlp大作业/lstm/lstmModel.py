@@ -5,17 +5,20 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-# Load vocabularies
+# 加载词汇表
 chinese_vocab = pd.read_csv("../pre_processing3/chinese_vocab.csv")
 english_vocab = pd.read_csv('../pre_processing3/english_vocab.csv')
 
+# 创建映射
 chinese_token_to_idx = dict(zip(chinese_vocab['Token'], chinese_vocab['Index']))
 english_idx_to_token = dict(zip(english_vocab['Index'], english_vocab['Token']))
 
+# 计算词汇表大小
 chinese_vocab_size = len(chinese_vocab)
 english_vocab_size = len(english_vocab)
 
 
+# 加载数据并进行处理
 def load_data(file_path, vocab_size):
     data = pd.read_csv(file_path)
     source = [list(map(int, seq.split())) for seq in data['source']]
@@ -30,10 +33,11 @@ train_source, train_target = load_data('../pre_processing3/train.csv', english_v
 val_source, val_target = load_data('../pre_processing3/val.csv', english_vocab_size)
 test_source, test_target = load_data('../pre_processing3/test.csv', english_vocab_size)
 
-# Pad sequences
+# 计算最长句子的长度
 max_encoder_seq_length = max(len(seq) for seq in train_source)
 max_decoder_seq_length = max(len(seq) for seq in train_target)
 
+# 将所有句子都填充到统一长度
 train_source = pad_sequences(train_source, maxlen=max_encoder_seq_length, padding='post')
 train_target = pad_sequences(train_target, maxlen=max_decoder_seq_length, padding='post')
 val_source = pad_sequences(val_source, maxlen=max_encoder_seq_length, padding='post')
@@ -41,10 +45,10 @@ val_target = pad_sequences(val_target, maxlen=max_decoder_seq_length, padding='p
 test_source = pad_sequences(test_source, maxlen=max_encoder_seq_length, padding='post')
 
 
-# Prepare target for training
+# 对目标序列做输入输出处理
 def process_target(target_sequences, max_length):
-    target_input = [seq[:-1] for seq in target_sequences]
-    target_output = [seq[1:] for seq in target_sequences]
+    target_input = [seq[:-1] for seq in target_sequences] # 去掉目标序列的最后一个词作为输入给解码器
+    target_output = [seq[1:] for seq in target_sequences] # 去掉目标序列的第一个词作为输出给解码器
 
     # Pad sequences to match the maximum length
     target_input = pad_sequences(target_input, maxlen=max_length, padding='post')
@@ -61,6 +65,7 @@ units = 256
 
 
 # Encoder
+# 编码器使用了双向LSTM（Bidirectional LSTM）来处理输入的中文序列。双向LSTM能同时从序列的前后两个方向捕捉信息，有助于提高模型的准确度。
 class Encoder(Model):
     def __init__(self, vocab_size, embedding_dim, enc_units):
         super(Encoder, self).__init__()
@@ -76,6 +81,7 @@ class Encoder(Model):
 
 
 # Decoder
+# 解码器使用LSTM（LSTM），并结合编码器的输出和最终状态。解码器的任务是生成一个翻译后的英文序列。
 class Decoder(Model):
     def __init__(self, vocab_size, embedding_dim, dec_units):
         super(Decoder, self).__init__()
@@ -116,13 +122,13 @@ except:
         train_target_output,
         validation_data=([val_source, val_target_input], val_target_output),
         batch_size=32,
-        epochs=8
+        epochs=10
     )
     # Save the model after training
     model.save(model_path)
     print("Model trained and saved to", model_path)
 
-# Function to translate text
+# 用户输入一个中文句子，首先会通过编码器将其转化为向量表示。然后，解码器会逐步生成英文翻译，直到遇到停止标记<eos>或翻译长度达到上限。
 def translate(text, max_encoder_seq_length, max_decoder_seq_length):
     tokenized_text = [chinese_token_to_idx.get(token, 0) for token in text.split()]
     encoder_input_seq = pad_sequences([tokenized_text], maxlen=max_encoder_seq_length, padding='post')
