@@ -1,12 +1,25 @@
-import my_h5py
+# -*- coding: utf-8 -*-
+import os
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
-# 打开模型文件
-class File:
-    pass
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+
+tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-zh-en")
+# model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-zh-en")
+model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-zh-en", torch_dtype="auto")
 
 
-with h5py.File('lstm_translation_model.h5', 'r') as f:
-    # 查看顶层键
-    print(f.keys())
-    # 查看某个键的内容
-    print(f['model_weights'].keys())
+
+text = "从时间上看，中国空间站的建造比国际空间站晚20多年。"
+# Tokenize the text
+batch = tokenizer.prepare_seq2seq_batch(src_texts=[text])
+
+# Make sure that the tokenized text does not exceed the maximum
+# allowed size of 512
+batch["input_ids"] = batch["input_ids"][:, :512]
+batch["attention_mask"] = batch["attention_mask"][:, :512]
+
+# Perform the translation and decode the output
+translation = model.generate(**batch)
+result = tokenizer.batch_decode(translation, skip_special_tokens=True)
+print(result)

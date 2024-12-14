@@ -6,11 +6,11 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 # Load vocabularies
-chinese_vocab = pd.read_csv("nlp大作业/pre_processing3/chinese_vocab.csv")
-english_vocab = pd.read_csv('nlp大作业/pre_processing3/english_vocab.csv')
+chinese_vocab = pd.read_csv("../pre_processing3/chinese_vocab.csv")
+english_vocab = pd.read_csv('../pre_processing3/english_vocab.csv')
 
 chinese_token_to_idx = dict(zip(chinese_vocab['Token'], chinese_vocab['Index']))
-english_token_to_idx = dict(zip(english_vocab['Token'], english_vocab['Index']))
+english_idx_to_token = dict(zip(english_vocab['Index'], english_vocab['Token']))
 
 chinese_vocab_size = len(chinese_vocab)
 english_vocab_size = len(english_vocab)
@@ -39,7 +39,6 @@ train_target = pad_sequences(train_target, maxlen=max_decoder_seq_length, paddin
 val_source = pad_sequences(val_source, maxlen=max_encoder_seq_length, padding='post')
 val_target = pad_sequences(val_target, maxlen=max_decoder_seq_length, padding='post')
 test_source = pad_sequences(test_source, maxlen=max_encoder_seq_length, padding='post')
-test_target = pad_sequences(test_target, maxlen=max_decoder_seq_length, padding='post')
 
 
 # Prepare target for training
@@ -105,16 +104,56 @@ model = Model([encoder_input, decoder_input], dec_output)
 model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
               metrics=['accuracy'])
 
-# Train the model
-history = model.fit(
-    [train_source, train_target_input],
-    train_target_output,
-    validation_data=([val_source, val_target_input], val_target_output),
-    batch_size=32,
-    epochs=10
-)
+# Check if a model already exists to load
+model_path = 'translation_model.h5'
+try:
+    model = tf.keras.models.load_model(model_path)
+    print("Loaded existing model from", model_path)
+except:
+    # Train the model
+    history = model.fit(
+        [train_source, train_target_input],
+        train_target_output,
+        validation_data=([val_source, val_target_input], val_target_output),
+        batch_size=32,
+        epochs=8
+    )
+    # Save the model after training
+    model.save(model_path)
+    print("Model trained and saved to", model_path)
 
-# Save the model
-model.save('lstm_translation_model.h5')
+# Function to translate text
+def translate(text, max_encoder_seq_length, max_decoder_seq_length):
+    tokenized_text = [chinese_token_to_idx.get(token, 0) for token in text.split()]
+    encoder_input_seq = pad_sequences([tokenized_text], maxlen=max_encoder_seq_length, padding='post')
+    states = encoder(encoder_input_seq)
+    target_seq = np.zeros((1, 1))
+    target_seq[0, 0] = english_vocab_size  # Start with the start token
+    stop_condition = False
+    decoded_text = ''
 
-print("Model training complete.")
+    while not stop_condition:
+        decoder_output, h, c = decoder(target_seq, *states)
+        decoder_output = tf.squeeze(decoder_output, 0)
+        sampled_token_index = np.argmax(decoder_output)
+        sampled_token = english_idx_to_token[sampled_token_index]
+        decoded_text += ' ' + sampled_token
+
+        # Exit condition: either hit max length or find stop token
+        if sampled_token == '<eos>' or len(decoded_text) > max_decoder_seq_length:
+            stop_condition = True
+
+        target_seq = np.zeros((1, 1))
+        target_seq[0, 0] = sampled_token_index
+        states = [h, c]
+
+    return decoded_text.strip()
+
+# Continuous translation loop
+print("Model ready for translation. Enter 'quit' to exit.")
+while True:
+    user_input = input("Enter text to translate (or 'quit' to exit): ")
+    if user_input.lower() == 'quit':
+        break
+    translated_text = translate(user_input, max_encoder_seq_length, max_decoder_seq_length)
+    print("Translated Text:", translated_text)
